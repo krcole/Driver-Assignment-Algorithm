@@ -1,5 +1,5 @@
 # platform_science
-Install Node.js: First, make sure you have Node.js installed on your system. You can download and install it from the official Node.js website: Node.js Download.
+Install Node.js: First, make sure you have Node.js installed on your system. You can download and install it from the official Node.js website: [Node.js Download](https://nodejs.org/en).
 
 Add the addresses into data/StreetAddress.txt in the format of Address, City, State, Zip
 
