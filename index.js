@@ -64,8 +64,8 @@ async function run() {
         rankings.push(result);
       }
       //   finde the highest scored pair
-      let assignment = fn_findHighestScoringObject(rankings);
-      //   console.log("rankings: ", rankings);
+      const assignment = fn_findHighestScoringObject(rankings);
+
       console.log(
         `Driver ${assignment.driver} has been assigned to ${assignment.address} with a score of ${assignment.score}`
       );
