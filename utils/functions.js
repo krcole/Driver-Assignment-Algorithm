@@ -9,25 +9,18 @@ const fn_readFile = async (filePath) => {
         return;
       }
 
-      // Split file content into lines
+      // Split file content into lines and trim each line
       const lines = data.split("\n").map((line) => line.trim());
 
-      // Convert lines to objects
-      const objectsArray = lines.map((line) => {
-        return line;
-      });
-
-      resolve(objectsArray);
+      // Return array of lines
+      resolve(lines);
     });
   });
 };
 
-// Function to check if a number is even
-const fn_isEven = (address) => {
-  // Extract the number from the address
-  const number = parseInt(address.match(/\d+/)[0]);
-  // Check if the number is even
-  return number % 2 === 0;
+// Function to count the number of consonants in a string
+const fn_isStringLengthEven = (str) => {
+  return str.length % 2 === 0;
 };
 
 // Function to count the number of consonants in a string
@@ -46,6 +39,17 @@ const fn_countVowels = (str) => {
   // Match all vowels in the string and return the count
   const vowels = str.toLowerCase().match(vowelsRegex);
   return vowels ? vowels.length : 0;
+};
+
+// Function to calculate suitability score based on street name and driver name
+const fn_calculateSuitabilityScore = (streetName, driver) => {
+  if (fn_isStringLengthEven(streetName)) {
+    const vowels = fn_countVowels(driver);
+    return vowels * 1.5;
+  } else {
+    const consonats = fn_countConsonants(driver);
+    return consonats;
+  }
 };
 
 // Function to check if two numbers have common factors
@@ -73,11 +77,28 @@ const fn_findHighestScoringObject = (objects) => {
   return highestScoreObject;
 };
 
+// Function to parse street name from full address
+const fn_parseStreetName = (fullAddress) => {
+  // Get the address from the full address
+  const address = fullAddress.split(",")[0];
+
+  // Find the index of the first space
+  const firstSpaceIndex = address.indexOf(" ");
+
+  // Extract the substring starting from the character after the first space
+  const streetName = address.substring(firstSpaceIndex + 1).trim();
+
+  // Return the street name
+  return streetName;
+};
+
 module.exports = {
   fn_readFile,
-  fn_isEven,
+  fn_isStringLengthEven,
   fn_countConsonants,
   fn_countVowels,
   fn_haveCommonFactors,
   fn_findHighestScoringObject,
+  fn_calculateSuitabilityScore,
+  fn_parseStreetName,
 };

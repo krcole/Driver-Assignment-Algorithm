@@ -1,35 +1,34 @@
 const {
   fn_readFile,
-  fn_isEven,
-  fn_countConsonants,
-  fn_countVowels,
+  fn_calculateSuitabilityScore,
   fn_haveCommonFactors,
   fn_findHighestScoringObject,
+  fn_parseStreetName,
 } = require("./utils/functions");
 
 // File paths
 const driverFilePath = "./data/Drivernames.txt";
 const addressFilePath = "./data/StreetAddresses.txt";
+const assignemnts = [];
 
 async function run() {
   try {
-    // get the list of all available drivers and addresses
+    // Get the list of all available addresses and drivers
     const [addresses, drivers] = await Promise.all([
       fn_readFile(addressFilePath),
       fn_readFile(driverFilePath),
     ]);
 
-    let max = 0;
-    // keep looping as long as a pair can be matched
-    while (
-      addresses.length > 0 &&
-      drivers.length > 0 &&
-      addresses.length === drivers.length
-    ) {
+    // Set a maximum iteration limit so it will only run for the maximum available addresses
+    const maxIterations = addresses.length;
+    for (let j = 0; j < maxIterations; j++) {
+      // Array to store rankings of drivers for each address
       const rankings = [];
-      //   loop through the available addresses
+
+      // Loop through the available addresses
       for (let i = 0; i < addresses.length; i++) {
-        let result = {
+        // Initialize result object for each address
+        const result = {
           address: addresses[i],
           addressId: i,
           driver: "",
@@ -38,51 +37,63 @@ async function run() {
           drivers: [],
         };
 
-        // loop through the list of drivers available
-        for (let z = 0; z < drivers.length; z++) {
-          let score = 0;
-          //   check if the address is even or add to add the multiplier
-          if (fn_isEven(addresses[i]) ? 1.5 : 1) {
-            score = fn_countVowels(drivers[z]) * 1.5;
-          } else {
-            score = fn_countConsonants(drivers[z]);
-          }
+        // If no more drivers are available, end the program
+        if (drivers.length === 0) {
+          throw new Error(
+            `You do not have any more drivers left to assign to the reamining ${address.length} address(es)`
+          );
+        }
 
-          // Check if the lengths share common factors
-          if (fn_haveCommonFactors(addresses[i].length, drivers[z].length)) {
+        // Get just the street name from the full address
+        const streetName = fn_parseStreetName(addresses[i]);
+
+        // Loop through the list of available drivers
+        for (let z = 0; z < drivers.length; z++) {
+          // Get the name of the driver at the current index
+          const drivernName = drivers[z];
+
+          // Calculate suitability score for the current driver and addres
+          let score = fn_calculateSuitabilityScore(streetName, drivernName);
+
+          // Check if the lengths of street name and driver name share common factors
+          if (
+            fn_haveCommonFactors(streetName.length, drivernName.trim().length)
+          ) {
             // Increase score by 50%
             score *= 1.5;
           }
-          //   set the new highest driver and score to this address
+
+          // Set the new highest scoring driver and score for this address
           if (score > result.score) {
-            result.driver = drivers[z];
+            result.driver = drivernName;
             result.score = score;
             result.driverId = z;
           }
         }
 
+        // Push the result object to rankings array
         rankings.push(result);
       }
-      //   finde the highest scored pair
+
+      // Find the highest scored pair
       const assignment = fn_findHighestScoringObject(rankings);
 
+      // Log the assignment details
       console.log(
         `Driver ${assignment.driver} has been assigned to ${assignment.address} with a score of ${assignment.score}`
       );
 
-      //   remove the address and driver that just got paired assigned with the highest score
+      // Save the assignments to be used later
+      assignemnts.push(
+        `Driver ${assignment.driver} has been assigned to ${assignment.address} with a score of ${assignment.score}`
+      );
+
+      // Remove the address and driver that just got paired with the highest score
       addresses.splice(assignment.addressId, 1);
       drivers.splice(assignment.driverId, 1);
-
-      //   add a safe guard to not get into an infanite loop
-      max++;
-      if (max === 10) {
-        break;
-      }
     }
-
-    // console.log("score: ", score);
   } catch (err) {
+    // Handle errors
     console.log("Something went wrong", err);
   }
 }
